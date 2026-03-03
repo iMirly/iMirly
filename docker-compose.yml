@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    container_name: imirly_db_container
+    restart: always
+    environment:
+      POSTGRES_USER: user_imirly
+      POSTGRES_PASSWORD: password_imirly
+      POSTGRES_DB: imirly_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data

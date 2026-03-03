@@ -1,0 +1,13 @@
+package tfg.imirly.messages.domain.model;
+
+public enum TipoMensaje {
+    TEXTO,
+    PROPUESTA_PRECIO,
+    PRESUPUESTO_ACEPTADO,
+    PRESUPUESTO_RECHAZADO,
+    PAGO_REALIZADO,
+    TRABAJO_FINALIZADO,
+    SERVICIO_COMPLETADO,
+    SERVICIO_RECHAZADO,
+    VALORACION
+}

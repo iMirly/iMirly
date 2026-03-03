@@ -1,0 +1,30 @@
+﻿.\gradlew : 
+En línea: 1 Carácter: 1
++ .\gradlew assembleDebug > 
+build_out.txt 2>&1 ; Get-Content 
+build_out. ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo          : NotS 
+   pecified: (:String) [], Remote  
+  Exception
+    + FullyQualifiedErrorId : Nati 
+   veCommandError
+ 
+FAILURE: Build failed with an 
+exception.
+
+* What went wrong:
+25
+
+* Try:
+> Run with --stacktrace option to 
+get the stack trace.
+> Run with --info or --debug 
+option to get more log output.
+> Run with --scan to get full 
+insights.
+> Get more help at 
+https://help.gradle.org.
+
+BUILD FAILED in 438ms

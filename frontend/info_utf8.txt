@@ -1,0 +1,54 @@
+﻿Initialized native services in: C:\Users\┴ngel\.gradle\native
+Initialized jansi services in: C:\Users\┴ngel\.gradle\native
+Found daemon DaemonInfo{pid=7708, address=[a904d818-8415-46b7-8c0c-d5e13bdaffa8 port:62704, addresses:[/127.0.0.1]], state=Idle, lastBusy=1772405879292, context=DefaultDaemonContext[uid=f606a85f-2644-4a19-9749-9e88f31501fd,javaHome=C:\Users\├üngel\.vscode\extensions\redhat.java-1.53.0-win32-x64\jre\21.0.10-win32-x86_64,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=C:\Users\├üngel\.gradle\daemon,pid=7708,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-Xmx2048m,-Dfile.encoding=UTF-8,-Duser.country=ES,-Duser.language=es,-Duser.variant]} however its context does not match the desired criteria.
+JVM is incompatible.
+Wanted: DaemonRequestContext{jvmCriteria=C:\Program Files\Java\jdk-25 (no JDK specified, using current Java home), daemonOpts=[-Xmx2048m, -Dfile.encoding=UTF-8, -Duser.country=ES, -Duser.language=es, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+Actual: DefaultDaemonContext[uid=f606a85f-2644-4a19-9749-9e88f31501fd,javaHome=C:\Users\├üngel\.vscode\extensions\redhat.java-1.53.0-win32-x64\jre\21.0.10-win32-x86_64,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=C:\Users\├üngel\.gradle\daemon,pid=7708,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-Xmx2048m,-Dfile.encoding=UTF-8,-Duser.country=ES,-Duser.language=es,-Duser.variant]
+
+  Looking for a different daemon...
+Found daemon DaemonInfo{pid=7048, address=[7f344aee-cc43-48f7-aab5-a7b213fe86aa port:50611, addresses:[/127.0.0.1]], state=Idle, lastBusy=1772407934009, context=DefaultDaemonContext[uid=6e09309f-22b1-4876-a0c4-8fc62917730d,javaHome=C:\Users\├üngel\.antigravity\extensions\redhat.java-1.52.0-win32-x64\jre\21.0.9-win32-x86_64,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=C:\Users\├üngel\.gradle\daemon,pid=7048,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-Xmx2048m,-Dfile.encoding=UTF-8,-Duser.country=ES,-Duser.language=es,-Duser.variant]} however its context does not match the desired criteria.
+JVM is incompatible.
+Wanted: DaemonRequestContext{jvmCriteria=C:\Program Files\Java\jdk-25 (no JDK specified, using current Java home), daemonOpts=[-Xmx2048m, -Dfile.encoding=UTF-8, -Duser.country=ES, -Duser.language=es, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+Actual: DefaultDaemonContext[uid=6e09309f-22b1-4876-a0c4-8fc62917730d,javaHome=C:\Users\├üngel\.antigravity\extensions\redhat.java-1.52.0-win32-x64\jre\21.0.9-win32-x86_64,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=C:\Users\├üngel\.gradle\daemon,pid=7048,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-Xmx2048m,-Dfile.encoding=UTF-8,-Duser.country=ES,-Duser.language=es,-Duser.variant]
+
+  Looking for a different daemon...
+The client will now receive all logging from the daemon (pid: 16856). The daemon log file: C:\Users\├üngel\.gradle\daemon\8.13\daemon-16856.out.log
+Starting 9th build in daemon [uptime: 12 mins 31.608 secs, performance: 99%, GC rate: 0.00/s, heap usage: 0% of 2 GiB]
+Using 20 worker leases.
+Now considering [D:\Proyectos\iMirly\frontend] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Starting Build
+Caching disabled for Kotlin DSL script compilation (Settings/TopLevel/stage1) because:
+  Build cache is disabled
+.\gradlew : 
+En línea: 1 Carácter: 1
++ .\gradlew assembleDebug --info > 
+info.txt 2>&1 ; Get-Content 
+info.txt ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo          : NotS 
+   pecified: (:String) [], Remote  
+  Exception
+    + FullyQualifiedErrorId : Nati 
+   veCommandError
+ 
+FAILURE: Build failed with an 
+exception.
+
+* What went wrong:
+25
+
+* Try:
+> Run with --stacktrace option to 
+get the stack trace.
+> Run with --debug option to get 
+more log output.
+> Run with --scan to get full 
+insights.
+> Get more help at 
+https://help.gradle.org.
+
+Watched directory hierarchies: []
+BUILD FAILED in 440ms

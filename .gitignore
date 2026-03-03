@@ -1,0 +1,19 @@
+# Docker - NUNCA subir los datos de la BD
+postgres_data/
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/wrapper/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.DS_Store
+
+# Sensible (si creas archivos .env luego)
+.env
