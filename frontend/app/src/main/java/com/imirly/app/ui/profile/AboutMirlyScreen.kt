@@ -35,7 +35,7 @@ fun AboutMirlyScreen(navController: NavController) {
             TopAppBar(
                 title = { Text("Sobre Mirly", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) { // TODO: Logic
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
                     }
                 },
@@ -48,19 +48,20 @@ fun AboutMirlyScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(innerPadding) // Aplicamos el padding para que no se oculte nada tras la TopAppBar
                 .background(lightBackground)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Header Section with Purple Background
+            // Sección de cabecera (Logo y Versión)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(220.dp)
-                    .background(iMirlyPurple)
-                    .padding(innerPadding),
+                    .height(180.dp) // Altura ajustada ya que no solapa con la barra
+                    .background(iMirlyPurple),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    // EL LOGO: Ahora visible
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(
                             shape = RoundedCornerShape(8.dp),
@@ -74,12 +75,26 @@ fun AboutMirlyScreen(navController: NavController) {
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Mirly", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 36.sp)
                     }
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text("Versión 1.0.0", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // LA VERSIÓN: Destacada
+                    Surface(
+                        color = Color.White.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Text(
+                            "Versión 1.0.0", 
+                            color = Color.White, 
+                            fontSize = 13.sp, 
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                        )
+                    }
                 }
             }
 
-            // Foreground Content Card Overlapping the Header
+            // El resto del contenido se mantiene igual pero con los offsets ajustados
             Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Surface(
                     shape = RoundedCornerShape(16.dp),
@@ -90,7 +105,6 @@ fun AboutMirlyScreen(navController: NavController) {
                         .offset(y = (-30).dp)
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
-                        
                         Box(
                             modifier = Modifier
                                 .size(40.dp)
@@ -100,7 +114,6 @@ fun AboutMirlyScreen(navController: NavController) {
                             Icon(Icons.Outlined.FavoriteBorder, contentDescription = null, tint = iMirlyPurple, modifier = Modifier.size(20.dp))
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        
                         Text("Nuestra misión", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.Black)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
@@ -113,62 +126,28 @@ fun AboutMirlyScreen(navController: NavController) {
                 }
             }
 
-            // Valores Section
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Surface(
                     shape = RoundedCornerShape(16.dp),
                     color = Color.White,
                     shadowElevation = 2.dp,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().offset(y = (-10).dp)
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Text("Nuestros valores", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.Black)
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Confianza
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(40.dp).background(Color(0xFFFFEBEE), CircleShape), contentAlignment = Alignment.Center) {
-                                Icon(Icons.Outlined.FavoriteBorder, contentDescription = null, tint = Color(0xFFE53935), modifier = Modifier.size(20.dp))
-                            }
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Column {
-                                Text("Confianza", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                Text("Verificamos todos los profesionales\npara garantizar un servicio de calidad", color = Color.Gray, fontSize = 12.sp, lineHeight = 16.sp)
-                            }
-                        }
+                        ValueItem(Icons.Outlined.FavoriteBorder, "Confianza", "Verificamos todos los profesionales\npara garantizar un servicio de calidad", Color(0xFFE53935), Color(0xFFFFEBEE))
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        // Comunidad
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(40.dp).background(Color(0xFFE3F2FD), CircleShape), contentAlignment = Alignment.Center) {
-                                Icon(Icons.Outlined.People, contentDescription = null, tint = Color(0xFF1E88E5), modifier = Modifier.size(20.dp))
-                            }
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Column {
-                                Text("Comunidad", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                Text("Construimos una red de confianza\nentre usuarios y profesionales", color = Color.Gray, fontSize = 12.sp, lineHeight = 16.sp)
-                            }
-                        }
+                        ValueItem(Icons.Outlined.People, "Comunidad", "Construimos una red de confianza\nentre usuarios y profesionales", Color(0xFF1E88E5), Color(0xFFE3F2FD))
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        // Seguridad
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(40.dp).background(Color(0xFFE8F5E9), CircleShape), contentAlignment = Alignment.Center) {
-                                Icon(Icons.Outlined.Security, contentDescription = null, tint = Color(0xFF43A047), modifier = Modifier.size(20.dp))
-                            }
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Column {
-                                Text("Seguridad", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                Text("Protegemos tus datos y transacciones con\nla máxima seguridad", color = Color.Gray, fontSize = 12.sp, lineHeight = 16.sp)
-                            }
-                        }
+                        ValueItem(Icons.Outlined.Security, "Seguridad", "Protegemos tus datos y transacciones con\nla máxima seguridad", Color(0xFF43A047), Color(0xFFE8F5E9))
                     }
                 }
             }
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Stats Section
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -182,7 +161,6 @@ fun AboutMirlyScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Links Section
             Surface(
                 shape = RoundedCornerShape(16.dp),
                 color = Color.White,
@@ -190,16 +168,15 @@ fun AboutMirlyScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             ) {
                 Column {
-                    AboutLinkItem("Términos y condiciones") { /* TODO */ }
-                    Divider(color = Color(0xFFF0F0F0))
-                    AboutLinkItem("Política de privacidad") { /* TODO */ }
-                    Divider(color = Color(0xFFF0F0F0))
-                    AboutLinkItem("Licencias") { /* TODO */ }
+                    AboutLinkItem("Términos y condiciones") { }
+                    HorizontalDivider(color = Color(0xFFF0F0F0))
+                    AboutLinkItem("Política de privacidad") { }
+                    HorizontalDivider(color = Color(0xFFF0F0F0))
+                    AboutLinkItem("Licencias") { }
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
             Text(
                 "© 2026 iMirly. Todos los derechos reservados.",
                 color = Color.Gray,
@@ -207,8 +184,21 @@ fun AboutMirlyScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
-
             Spacer(modifier = Modifier.height(40.dp))
+        }
+    }
+}
+
+@Composable
+fun ValueItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, desc: String, tint: Color, bg: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier.size(40.dp).background(bg, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp))
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Column {
+            Text(title, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text(desc, color = Color.Gray, fontSize = 12.sp, lineHeight = 16.sp)
         }
     }
 }

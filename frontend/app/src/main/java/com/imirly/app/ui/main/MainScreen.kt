@@ -66,12 +66,24 @@ fun MainScreen(rootNavController: NavHostController) {
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = iMirlyPurple,
                             selectedTextColor = iMirlyPurple,
-                            indicatorColor = Color(0xFFE0E0FF), // Fondo sutil al seleccionar
+                            indicatorColor = Color(0xFFE0E0FF),
                             unselectedIconColor = Color.Gray,
                             unselectedTextColor = Color.Gray
                         ),
                         onClick = {
-                            if (currentRoute != item.route) {
+                            // Si pulsamos el botón de Home (la casa)
+                            if (item.route == BottomNavItem.Home.route) {
+                                bottomNavController.navigate(item.route) {
+                                    // Limpiamos todo el historial de la pestaña Home para que vuelva al inicio real
+                                    popUpTo(bottomNavController.graph.startDestinationId) {
+                                        inclusive = false
+                                        saveState = false // NO guardamos el estado para que se resetee
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = false // NO restauramos el estado anterior
+                                }
+                            } else if (currentRoute != item.route) {
+                                // Para el resto de pestañas, mantenemos el comportamiento estándar
                                 bottomNavController.navigate(item.route) {
                                     popUpTo(bottomNavController.graph.startDestinationId) { saveState = true }
                                     launchSingleTop = true
@@ -84,40 +96,25 @@ fun MainScreen(rootNavController: NavHostController) {
             }
         }
     ) { innerPadding ->
-        // Aquí cargamos las pantallas según la pestaña seleccionada
-        // ... dentro de MainScreen.kt ...
         NavHost(
             navController = bottomNavController,
             startDestination = BottomNavItem.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            // AHORA PASAMOS EL bottomNavController A LA HOME
             composable(BottomNavItem.Home.route) {
                 HomeScreen(bottomNavController)
             }
 
-            // NUEVA RUTA: Recibe el ID y el Nombre como parámetros
             composable("subcategories/{id}/{nombre}") { backStackEntry ->
                 val id = backStackEntry.arguments?.getString("id") ?: ""
                 val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
-
-                SubcategoriesScreen(
-                    navController = bottomNavController,
-                    categoriaId = id,
-                    categoriaNombre = nombre
-                )
+                SubcategoriesScreen(navController = bottomNavController, categoriaId = id, categoriaNombre = nombre)
             }
 
-            // (Opcional) Deja ya lista la ruta para el siguiente paso: la lista de anuncios
             composable("anuncios_list/{id}/{nombre}") { backStackEntry ->
                 val id = backStackEntry.arguments?.getString("id") ?: ""
                 val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
-
-                AnunciosListScreen(
-                    navController = bottomNavController,
-                    subcategoriaId = id,
-                    subcategoriaNombre = nombre
-                )
+                AnunciosListScreen(navController = bottomNavController, subcategoriaId = id, subcategoriaNombre = nombre)
             }
 
             composable("anuncio_detail/{id}") { backStackEntry ->
@@ -132,63 +129,41 @@ fun MainScreen(rootNavController: NavHostController) {
             composable(BottomNavItem.Publish.route) {
                 PublishScreen(
                     onPublishSuccess = {
-                        // 1. Movemos la pestaña inferior al Perfil de forma invisible
                         bottomNavController.navigate(BottomNavItem.Profile.route) {
                             popUpTo(bottomNavController.graph.startDestinationId) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
-                        // 2. Abrimos la pantalla de Mis Anuncios por encima
                         rootNavController.navigate("mis_anuncios")
                     }
                 )
             }
 
-            // 👇 RUTA DEL BUSCADOR CORREGIDA 👇
             composable(
                 route = "search?categoriaId={categoriaId}",
                 arguments = listOf(navArgument("categoriaId") {
-                    type = NavType.StringType // <--- ESTO ES LO QUE FALTABA
+                    type = NavType.StringType
                     nullable = true
                     defaultValue = null
                 })
             ) { backStackEntry ->
                 val categoriaId = backStackEntry.arguments?.getString("categoriaId")
-                com.imirly.app.ui.catalog.SearchScreen(
-                    navController = bottomNavController,
-                    categoriaId = categoriaId
-                )
+                com.imirly.app.ui.catalog.SearchScreen(navController = bottomNavController, categoriaId = categoriaId)
             }
 
             composable(BottomNavItem.Messages.route) {
-                com.imirly.app.ui.messages.MessagesScreen(navController = bottomNavController)            }
+                com.imirly.app.ui.messages.MessagesScreen(navController = bottomNavController)
+            }
 
-            // NUEVA RUTA: Pantalla de Chat (Añadimos soyElProveedor al final)
             composable("chat/{otroUsuarioId}/{nombre}/{solicitudId}/{soyElProveedor}") { backStackEntry ->
                 val otroUsuarioId = backStackEntry.arguments?.getString("otroUsuarioId") ?: ""
                 val nombre = backStackEntry.arguments?.getString("nombre") ?: "Usuario"
                 val solicitudId = backStackEntry.arguments?.getString("solicitudId") ?: ""
-                // 👇 Recuperamos si somos el proveedor 👇
                 val soyElProveedor = backStackEntry.arguments?.getString("soyElProveedor")?.toBoolean() ?: false
-
-                com.imirly.app.ui.chat.ChatScreen(
-                    navController = bottomNavController,
-                    otroUsuarioId = otroUsuarioId,
-                    nombreContacto = nombre,
-                    solicitudId = solicitudId,
-                    soyElProveedor = soyElProveedor // <--- SE LO PASAMOS
-                )
+                com.imirly.app.ui.chat.ChatScreen(navController = bottomNavController, otroUsuarioId = otroUsuarioId, nombreContacto = nombre, solicitudId = solicitudId, soyElProveedor = soyElProveedor)
             }
 
             composable(BottomNavItem.Profile.route) { ProfileScreen(rootNavController) }
         }
-    }
-}
-
-// Una pantalla temporal (Placeholder) para que no dé error mientras las construimos
-@Composable
-fun DummyScreen(texto: String) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = texto, fontSize = 20.sp, color = Color.Gray)
     }
 }

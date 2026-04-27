@@ -49,7 +49,7 @@ fun OnboardingScreen(navController: NavController) {
             OnboardingPageContent(page)
         }
 
-        // 1. Indicador de puntos (Dots) - Igual que en tu Figma
+        // 1. Indicador de puntos (Dots)
         Row(
             Modifier.height(50.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
@@ -68,13 +68,13 @@ fun OnboardingScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // 2. Botón Principal (Siguiente o Comenzar)
+        // 2. Botón Principal (Siguiente o Comenzar -> va a REGISTER)
         Button(
             onClick = {
                 if (pagerState.currentPage < 2) {
                     scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
                 } else {
-                    navController.navigate("login")
+                    navController.navigate("register")
                 }
             },
             modifier = Modifier.fillMaxWidth(0.85f).height(55.dp),
@@ -88,7 +88,7 @@ fun OnboardingScreen(navController: NavController) {
             )
         }
 
-        // 3. Botón Secundario (Omitir o Ya tengo cuenta)
+        // 3. Botón Secundario (Omitir o Ya tengo cuenta -> va a LOGIN)
         TextButton(
             onClick = { navController.navigate("login") },
             modifier = Modifier.padding(top = 10.dp)
@@ -106,23 +106,10 @@ fun OnboardingScreen(navController: NavController) {
 
 @Composable
 fun OnboardingPageContent(page: Int) {
-    // 1. Identificar qué imagen toca según la página
-    val imageRes = when (page) {
-        0 -> R.drawable.onboarding_1
-        1 -> R.drawable.onboarding_2
-        else -> R.drawable.onboarding_3
-    }
-
     val title = when (page) {
         0 -> "Encuentra profesionales cerca de ti"
         1 -> "Conecta fácilmente"
         else -> "Reserva con confianza"
-    }
-
-    val icon = when (page) {
-        0 -> Icons.Filled.Search
-        1 -> Icons.Filled.Security
-        else -> Icons.Filled.Star
     }
 
     Column(
@@ -130,53 +117,43 @@ fun OnboardingPageContent(page: Int) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        // Logo arriba en todas las pantallas
+        Text(
+            text = "iMirly",
+            color = Color.White,
+            fontSize = 32.sp,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
+
         // Contenedor de la imagen
         Box(contentAlignment = Alignment.BottomEnd) {
             Surface(
-                modifier = Modifier.size(300.dp), // Ajustado según Figma
+                modifier = Modifier.size(280.dp),
                 shape = RoundedCornerShape(32.dp),
                 color = Color.White.copy(alpha = 0.2f)
             ) {
-                // AQUÍ SE CARGA LA IMAGEN REAL
+                val imageRes = when (page) {
+                    0 -> R.drawable.onboarding_1
+                    1 -> R.drawable.onboarding_2
+                    else -> R.drawable.onboarding_3
+                }
                 Image(
                     painter = painterResource(id = imageRes),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop // Para que rellene el cuadro
-                )
-            }
-
-            // Icono flotante característico del diseño
-            Surface(
-                modifier = Modifier.size(56.dp).offset(x = (10).dp, y = (10).dp),
-                shape = RoundedCornerShape(16.dp),
-                color = when(page) {
-                    0 -> Color(0xFFE0E0FF)
-                    1 -> Color(0xFFE0FFE0)
-                    else -> Color(0xFFFFF4CC)
-                },
-                shadowElevation = 6.dp
-            ) {
-                Icon(
-                    icon,
-                    contentDescription = null,
-                    tint = when(page) {
-                        0 -> Color(0xFF6C5CE7)
-                        1 -> Color(0xFF2ECC71)
-                        else -> Color(0xFFF1C40F)
-                    },
-                    modifier = Modifier.padding(14.dp)
+                    contentScale = ContentScale.Crop
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         Text(
             text = title,
             color = Color.White,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.ExtraBold,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
 

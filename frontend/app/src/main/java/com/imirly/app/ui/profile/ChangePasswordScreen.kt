@@ -5,13 +5,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,40 +57,31 @@ fun ChangePasswordScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(24.dp))
 
             // Campo: Contraseña Actual
-            OutlinedTextField(
+            PasswordTextField(
                 value = viewModel.oldPassword.value,
                 onValueChange = { viewModel.oldPassword.value = it },
-                label = { Text("Contraseña actual") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = iMirlyPurple)
+                label = "Contraseña actual",
+                iMirlyPurple = iMirlyPurple
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Campo: Nueva Contraseña
-            OutlinedTextField(
+            PasswordTextField(
                 value = viewModel.newPassword.value,
                 onValueChange = { viewModel.newPassword.value = it },
-                label = { Text("Nueva contraseña") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = iMirlyPurple)
+                label = "Nueva contraseña",
+                iMirlyPurple = iMirlyPurple
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Campo: Confirmar Nueva Contraseña
-            OutlinedTextField(
+            PasswordTextField(
                 value = viewModel.confirmPassword.value,
                 onValueChange = { viewModel.confirmPassword.value = it },
-                label = { Text("Confirmar nueva contraseña") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = iMirlyPurple)
+                label = "Confirmar nueva contraseña",
+                iMirlyPurple = iMirlyPurple
             )
 
             // Mensaje de Error / Éxito
@@ -125,4 +119,29 @@ fun ChangePasswordScreen(navController: NavController) {
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PasswordTextField(value: String, onValueChange: (String) -> Unit, label: String, iMirlyPurple: Color) {
+    var passwordVisible by remember { mutableStateOf(false) }
+    
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+            val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+
+            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                Icon(imageVector = image, contentDescription = description)
+            }
+        },
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = iMirlyPurple),
+        singleLine = true
+    )
 }

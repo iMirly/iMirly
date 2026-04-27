@@ -10,8 +10,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,10 +23,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.imirly.app.ui.auth.RegisterViewModel
 
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = viewModel()) {
@@ -33,28 +33,26 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
 
     LaunchedEffect(viewModel.mensaje.value) {
         if (viewModel.mensaje.value.contains("éxito")) {
-            kotlinx.coroutines.delay(1000) // Small delay to show the success message
+            kotlinx.coroutines.delay(1000)
             navController.navigate("login") {
                 popUpTo("register") { inclusive = true }
             }
         }
     }
 
-    // El Box ahora alinea TODO al centro
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(iMirlyPurple)
-            .padding(24.dp), // Margen externo para que no toque los bordes del móvil
+            .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState()) // Por si el teclado tapa algo en pantallas pequeñas
+                .verticalScroll(rememberScrollState())
         ) {
-            // Logo "iMirly"
             Text(
                 text = "iMirly",
                 color = Color.White,
@@ -64,12 +62,11 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Tarjeta Blanca Centrada
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(28.dp), // Redondeado en todas las esquinas
+                shape = RoundedCornerShape(28.dp),
                 color = Color.White,
-                shadowElevation = 8.dp // Un poco de sombra para que resalte
+                shadowElevation = 8.dp
             ) {
                 Column(
                     modifier = Modifier
@@ -144,12 +141,12 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "¿Ya tienes cuenta? Iniciar sesión",
+                        text = "¿Ya tienes cuenta? Inicia sesión",
                         color = iMirlyPurple,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.clickable {
-                            navController.navigate("login") // <--- Ahora ya funciona!
+                            navController.navigate("login")
                         }
                     )
                 }
@@ -158,7 +155,6 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = 
     }
 }
 
-// El componente CustomTextField se mantiene igual que antes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTextField(
@@ -169,17 +165,29 @@ fun CustomTextField(
     containerColor: Color,
     isPassword: Boolean = false
 ) {
+    var passwordVisible by remember { mutableStateOf(false) }
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label, fontSize = 14.sp) },
         leadingIcon = { Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp)) },
+        trailingIcon = {
+            if (isPassword) {
+                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, contentDescription = description)
+                }
+            }
+        },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         shape = RoundedCornerShape(12.dp),
         singleLine = true,
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = containerColor,
             unfocusedContainerColor = containerColor,

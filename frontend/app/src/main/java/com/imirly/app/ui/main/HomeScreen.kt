@@ -1,7 +1,6 @@
 package com.imirly.app.ui.main
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -43,7 +42,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // 2. Buscador (Ahora es clickable)
+        // 2. Buscador
         Box(modifier = Modifier.fillMaxWidth().clickable { navController.navigate("search") }) {
             OutlinedTextField(
                 value = "",
@@ -59,7 +58,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
                     disabledPlaceholderColor = Color.Gray,
                     disabledLeadingIconColor = Color.Gray
                 ),
-                enabled = false // Desactivado para que no abra el teclado aquí, sino en la siguiente pantalla
+                enabled = false
             )
         }
 
@@ -82,14 +81,6 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
                 Text("Servicios locales,\nsoluciones reales.\niMirly", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold, lineHeight = 28.sp)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("Miles de profesionales listos para ayudarte", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = { /* TODO */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Explorar servicios", color = iMirlyPurple, fontWeight = FontWeight.Bold)
-                }
             }
         }
 
@@ -115,23 +106,19 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
         if (viewModel.isLoading.value) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally), color = iMirlyPurple)
         } else {
-            // Cuadrícula de 2 columnas casera para evitar conflictos de scroll
             val categorias = viewModel.categorias.value
             for (i in categorias.indices step 2) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    // Primera tarjeta de la fila
                     CategoryCard(
                         categoria = categorias[i],
                         modifier = Modifier
                             .weight(1f)
                             .clickable {
-                                // Navega pasando el ID y el Nombre
                                 navController.navigate("subcategories/${categorias[i].id}/${categorias[i].nombre}")
                             }
                     )
 
                     if (i + 1 < categorias.size) {
-                        // Segunda tarjeta de la fila
                         CategoryCard(
                             categoria = categorias[i + 1],
                             modifier = Modifier
@@ -173,17 +160,12 @@ fun CategoryCard(categoria: CategoriaResponse, modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.Top
         ) {
             val context = androidx.compose.ui.platform.LocalContext.current
-
-            // Intenta primero con el icono exacto que viene del backend
-            // Ej: "deporte_yoga", "deporte", "belleza_facial", etc.
             val imageResId = remember(categoria.icono) {
                 val resId = context.resources.getIdentifier(
-                    categoria.icono,  // Debe ser exactamente "deporte_yoga" sin extensión
+                    categoria.icono,
                     "drawable",
                     context.packageName
                 )
-                // Si no encuentra el icono específico, busca la categoría padre
-                // Ej: "deporte_yoga" -> intenta "deporte"
                 if (resId == 0) {
                     val parentIcono = categoria.icono.substringBefore("_")
                     val parentResId = context.resources.getIdentifier(

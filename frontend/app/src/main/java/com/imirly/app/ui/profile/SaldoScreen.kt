@@ -2,11 +2,8 @@ package com.imirly.app.ui.profile
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -16,7 +13,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.CardGiftcard
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.*
@@ -39,38 +35,34 @@ fun SaldoScreen(navController: NavController, viewModel: SaldoViewModel = viewMo
     val bgLight = Color(0xFFFAFAFA)
     val context = LocalContext.current
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(bgLight)
-    ) {
-        // --- SECCIÓN SUPERIOR MORADA ---
-        item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(iMirlyPurple)
-                    .padding(bottom = 32.dp)
-            ) {
-                Column {
-                    // Toolbar
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp, start = 8.dp, end = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text("Saldo", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(end = 36.dp))
-                        Spacer(modifier = Modifier.weight(1f))
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Saldo", color = Color.White, fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Tarjeta Principal
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = iMirlyPurple)
+            )
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(bgLight)
+        ) {
+            // --- SECCIÓN SUPERIOR MORADA (CABECERA DE SALDO) ---
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(iMirlyPurple)
+                        .padding(bottom = 32.dp, top = 8.dp)
+                ) {
+                    // Tarjeta Principal de Saldo
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -139,98 +131,98 @@ fun SaldoScreen(navController: NavController, viewModel: SaldoViewModel = viewMo
                     }
                 }
             }
-        }
 
-        // --- SECCIÓN BLANCA INFERIOR ---
-        item {
-            Column(modifier = Modifier.padding(horizontal = 24.dp).offset(y = (-20).dp)) {
-                // Tarjetas pequeñas "Pendiente" y "Este mes"
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Surface(
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(16.dp),
-                        color = Color.White,
-                        shadowElevation = 2.dp
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Box(modifier = Modifier.size(32.dp).clip(CircleShape).background(Color(0xFFFFF7E6)), contentAlignment = Alignment.Center) {
-                                Icon(Icons.Outlined.AccessTime, contentDescription = null, tint = Color(0xFFFFB800), modifier = Modifier.size(18.dp))
+            // --- SECCIÓN BLANCA INFERIOR ---
+            item {
+                Column(modifier = Modifier.padding(horizontal = 24.dp).offset(y = (-20).dp)) {
+                    // Tarjetas pequeñas "Pendiente" y "Este mes"
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(16.dp),
+                            color = Color.White,
+                            shadowElevation = 2.dp
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Box(modifier = Modifier.size(32.dp).clip(CircleShape).background(Color(0xFFFFF7E6)), contentAlignment = Alignment.Center) {
+                                    Icon(Icons.Outlined.AccessTime, contentDescription = null, tint = Color(0xFFFFB800), modifier = Modifier.size(18.dp))
+                                }
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text("Pendiente", color = Color.Gray, fontSize = 12.sp)
+                                Text(String.format("%.2f€", viewModel.pendiente.value), color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                             }
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text("Pendiente", color = Color.Gray, fontSize = 12.sp)
-                            Text(String.format("%.2f€", viewModel.pendiente.value), color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        }
+                        
+                        Surface(
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(16.dp),
+                            color = Color.White,
+                            shadowElevation = 2.dp
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Box(modifier = Modifier.size(32.dp).clip(CircleShape).background(Color(0xFFE6F9F0)), contentAlignment = Alignment.Center) {
+                                    Icon(Icons.Outlined.TrendingUp, contentDescription = null, tint = Color(0xFF2ECC71), modifier = Modifier.size(18.dp))
+                                }
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text("Este mes", color = Color.Gray, fontSize = 12.sp)
+                                Text(String.format("%.2f€", viewModel.esteMes.value), color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                     
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    // Banner "Invita y gana"
                     Surface(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        color = Color(0xFFF3F1FF),
+                        shadowElevation = 0.dp
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(Color.White), contentAlignment = Alignment.Center) {
+                                Icon(Icons.Default.CardGiftcard, contentDescription = null, tint = iMirlyPurple)
+                            }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("¡Invita y gana!", fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 14.sp)
+                                Text("Gana 10€ por cada amigo que se registre", color = Color.DarkGray, fontSize = 12.sp)
+                            }
+                            Icon(Icons.Default.ArrowUpward, contentDescription = null, tint = iMirlyPurple, modifier = Modifier.size(16.dp))
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                    
+                    // Transacciones recientes
+                    Surface(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
                         shape = RoundedCornerShape(16.dp),
                         color = Color.White,
                         shadowElevation = 2.dp
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Box(modifier = Modifier.size(32.dp).clip(CircleShape).background(Color(0xFFE6F9F0)), contentAlignment = Alignment.Center) {
-                                Icon(Icons.Outlined.TrendingUp, contentDescription = null, tint = Color(0xFF2ECC71), modifier = Modifier.size(18.dp))
-                            }
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text("Este mes", color = Color.Gray, fontSize = 12.sp)
-                            Text(String.format("%.2f€", viewModel.esteMes.value), color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                // Banner "Invita y gana"
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color(0xFFF3F1FF),
-                    shadowElevation = 0.dp
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(Color.White), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Default.CardGiftcard, contentDescription = null, tint = iMirlyPurple)
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("¡Invita y gana!", fontWeight = FontWeight.Bold, color = Color.Black, fontSize = 14.sp)
-                            Text("Gana 10€ por cada amigo que se registre", color = Color.DarkGray, fontSize = 12.sp)
-                        }
-                        Icon(Icons.Default.ArrowUpward, contentDescription = null, tint = iMirlyPurple, modifier = Modifier.size(16.dp))
-                    }
-                }
-                
-                Spacer(modifier = Modifier.height(32.dp))
-                
-                // Transacciones recientes
-                Surface(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    color = Color.White,
-                    shadowElevation = 2.dp
-                ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        Text("Transacciones recientes", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
-                        Divider(color = Color(0xFFF0F0F0))
-                        
-                        if (viewModel.transacciones.value.isEmpty()) {
-                            Text("No hay transacciones recientes.", color = Color.Gray, fontSize = 14.sp)
-                        } else {
-                            viewModel.transacciones.value.forEach { tr ->
-                                TransactionListItem(
-                                    title = tr.titulo,
-                                    subtitle = tr.subTitulo,
-                                    amount = tr.cantidadFormateada,
-                                    status = tr.estado,
-                                    time = tr.tiempo
-                                )
-                                Divider(color = Color(0xFFF0F0F0))
+                        Column(modifier = Modifier.padding(20.dp)) {
+                            Text("Transacciones recientes", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
+                            HorizontalDivider(color = Color(0xFFF0F0F0))
+                            
+                            if (viewModel.transacciones.value.isEmpty()) {
+                                Text("No hay transacciones recientes.", color = Color.Gray, fontSize = 14.sp)
+                            } else {
+                                viewModel.transacciones.value.forEach { tr ->
+                                    TransactionListItem(
+                                        title = tr.titulo,
+                                        subtitle = tr.subTitulo,
+                                        amount = tr.cantidadFormateada,
+                                        status = tr.estado,
+                                        time = tr.tiempo
+                                    )
+                                    HorizontalDivider(color = Color(0xFFF0F0F0))
+                                }
                             }
                         }
                     }

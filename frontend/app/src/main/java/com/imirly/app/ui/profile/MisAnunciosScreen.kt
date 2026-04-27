@@ -23,72 +23,85 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.imirly.app.network.AnuncioResponse
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MisAnunciosScreen(navController: NavController, viewModel: MisAnunciosViewModel = viewModel()) {
     val iMirlyPurple = Color(0xFF6C5CE7)
 
-    Column(modifier = Modifier.fillMaxSize().background(Color(0xFFFAFAFA))) {
-        // CABECERA UNIVERSAL ESTANDARIZADA
-        Row(
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Mis anuncios", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color.Black
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            )
+        }
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp, start = 12.dp, end = 24.dp, bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(Color(0xFFFAFAFA))
         ) {
-            // El IconButton ya tiene 12dp de margen interno, por eso el start de la Row es 12dp (12+12=24dp perfectos)
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.Black)
-            }
-            Spacer(modifier = Modifier.width(4.dp))
-            // Título: "Mis anuncios" o la variable `subcategoriaNombre`
-            Text("Mis anuncios", fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        }
-
-        // Selector de Pestañas (Tabs)
-        TabRow(
-            selectedTabIndex = viewModel.selectedTab.value,
-            containerColor = Color.Transparent,
-            contentColor = iMirlyPurple,
-            indicator = { tabPositions ->
-                TabRowDefaults.SecondaryIndicator(
-                    Modifier.tabIndicatorOffset(tabPositions[viewModel.selectedTab.value]),
-                    color = iMirlyPurple
-                )
-            },
-            divider = {}
-        ) {
-            Tab(
-                selected = viewModel.selectedTab.value == 0,
-                onClick = { viewModel.selectedTab.value = 0 },
-                text = { Text("Activos (${viewModel.anunciosActivos.value.size})") }
-            )
-            Tab(
-                selected = viewModel.selectedTab.value == 1,
-                onClick = { viewModel.selectedTab.value = 1 },
-                text = { Text("Inactivos (${viewModel.anunciosInactivos.value.size})") }
-            )
-        }
-
-        if (viewModel.isLoading.value) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = iMirlyPurple)
-            }
-        } else {
-            val listaAMostrar = if (viewModel.selectedTab.value == 0) viewModel.anunciosActivos.value else viewModel.anunciosInactivos.value
-
-            LazyColumn(
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            // Selector de Pestañas (Tabs)
+            TabRow(
+                selectedTabIndex = viewModel.selectedTab.value,
+                containerColor = Color.White,
+                contentColor = iMirlyPurple,
+                indicator = { tabPositions ->
+                    TabRowDefaults.SecondaryIndicator(
+                        Modifier.tabIndicatorOffset(tabPositions[viewModel.selectedTab.value]),
+                        color = iMirlyPurple
+                    )
+                },
+                divider = { HorizontalDivider(color = Color(0xFFF0F0F0)) }
             ) {
-                items(listaAMostrar) { anuncio ->
-                    AnuncioCard(anuncio)
+                Tab(
+                    selected = viewModel.selectedTab.value == 0,
+                    onClick = { viewModel.selectedTab.value = 0 },
+                    text = { Text("Activos (${viewModel.anunciosActivos.value.size})") }
+                )
+                Tab(
+                    selected = viewModel.selectedTab.value == 1,
+                    onClick = { viewModel.selectedTab.value = 1 },
+                    text = { Text("Inactivos (${viewModel.anunciosInactivos.value.size})") }
+                )
+            }
+
+            if (viewModel.isLoading.value) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = iMirlyPurple)
+                }
+            } else {
+                val listaAMostrar = if (viewModel.selectedTab.value == 0) viewModel.anunciosActivos.value else viewModel.anunciosInactivos.value
+
+                if (listaAMostrar.isEmpty()) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No tienes anuncios en esta sección", color = Color.Gray)
+                    }
+                } else {
+                    LazyColumn(
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(listaAMostrar) { anuncio ->
+                            AnuncioCard(anuncio, viewModel)
+                        }
+                    }
                 }
             }
         }
     }
-    // Al final de MisAnunciosScreen, antes de cerrar el bloque principal:
 
-    // 1. DIÁLOGO DE BORRADO
+    // DIÁLOGOS
     if (viewModel.showDeleteConfirm.value) {
         AlertDialog(
             onDismissRequest = { viewModel.showDeleteConfirm.value = false },
@@ -107,21 +120,20 @@ fun MisAnunciosScreen(navController: NavController, viewModel: MisAnunciosViewMo
         )
     }
 
-    // 2. DIÁLOGO DE EDICIÓN (Siguiendo el estilo de Nuevo Anuncio)
     if (viewModel.showEditDialog.value) {
         AlertDialog(
             onDismissRequest = { viewModel.showEditDialog.value = false },
             title = { Text("Editar Anuncio", fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    OutlinedTextField(value = viewModel.editTitulo.value, onValueChange = { viewModel.editTitulo.value = it }, label = { Text("Título") })
-                    OutlinedTextField(value = viewModel.editPrecio.value, onValueChange = { viewModel.editPrecio.value = it }, label = { Text("Precio/hora (€)") })
-                    OutlinedTextField(value = viewModel.editUbicacion.value, onValueChange = { viewModel.editUbicacion.value = it }, label = { Text("Ubicación") })
+                    OutlinedTextField(value = viewModel.editTitulo.value, onValueChange = { viewModel.editTitulo.value = it }, label = { Text("Título") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = viewModel.editPrecio.value, onValueChange = { viewModel.editPrecio.value = it }, label = { Text("Precio/hora (€)") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = viewModel.editUbicacion.value, onValueChange = { viewModel.editUbicacion.value = it }, label = { Text("Ubicación") }, modifier = Modifier.fillMaxWidth())
                     OutlinedTextField(
                         value = viewModel.editDescripcion.value,
                         onValueChange = { viewModel.editDescripcion.value = it },
                         label = { Text("Descripción") },
-                        modifier = Modifier.height(100.dp)
+                        modifier = Modifier.fillMaxWidth().height(100.dp)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -130,10 +142,11 @@ fun MisAnunciosScreen(navController: NavController, viewModel: MisAnunciosViewMo
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text("Anuncio visible", fontWeight = FontWeight.SemiBold)
-                            Text("Si lo desactivas, no aparecerá en el catálogo", fontSize = 12.sp, color = Color.Gray)
+                            Text("Si lo desactivas, no aparecerá en el catálogo", fontSize = 11.sp, color = Color.Gray, lineHeight = 14.sp)
                         }
+                        Spacer(modifier = Modifier.width(16.dp))
                         Switch(
                             checked = viewModel.editActivo.value,
                             onCheckedChange = { viewModel.editActivo.value = it },
@@ -152,7 +165,7 @@ fun MisAnunciosScreen(navController: NavController, viewModel: MisAnunciosViewMo
 }
 
 @Composable
-fun AnuncioCard(anuncio: AnuncioResponse, viewModel: MisAnunciosViewModel = viewModel()) {
+fun AnuncioCard(anuncio: AnuncioResponse, viewModel: MisAnunciosViewModel) {
     val iMirlyPurple = Color(0xFF6C5CE7)
 
     Surface(
@@ -162,7 +175,6 @@ fun AnuncioCard(anuncio: AnuncioResponse, viewModel: MisAnunciosViewModel = view
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // Placeholder de imagen
                 Surface(
                     modifier = Modifier.size(80.dp),
                     shape = RoundedCornerShape(12.dp),
@@ -176,7 +188,6 @@ fun AnuncioCard(anuncio: AnuncioResponse, viewModel: MisAnunciosViewModel = view
                 Column(modifier = Modifier.weight(1f)) {
                     Text(anuncio.titulo, fontWeight = FontWeight.Bold, fontSize = 16.sp)
 
-                    // Nueva fila para la ubicación
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(12.dp))
                         Spacer(Modifier.width(4.dp))
@@ -185,16 +196,11 @@ fun AnuncioCard(anuncio: AnuncioResponse, viewModel: MisAnunciosViewModel = view
 
                     Text("${anuncio.precioHora}€/hora", color = iMirlyPurple, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
-
-                IconButton(onClick = { /* Menú de opciones */ }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = null, tint = Color.LightGray)
-                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // Badge de Estado
                 Surface(
                     color = if (anuncio.activo) Color(0xFFE8F5E9) else Color(0xFFF5F5F5),
                     shape = RoundedCornerShape(8.dp)
@@ -218,13 +224,11 @@ fun AnuncioCard(anuncio: AnuncioResponse, viewModel: MisAnunciosViewModel = view
 
                 Spacer(Modifier.weight(1f))
 
-                // Botones de acción
-                // En MisAnunciosScreen.kt, dentro de AnuncioCard:
-                IconButton(onClick = { viewModel.prepararEdicion(anuncio) }) { // <--- Edición
-                    Icon(Icons.Outlined.Edit, contentDescription = null, tint = iMirlyPurple)
+                IconButton(onClick = { viewModel.prepararEdicion(anuncio) }) {
+                    Icon(Icons.Outlined.Edit, contentDescription = "Editar", tint = iMirlyPurple)
                 }
-                IconButton(onClick = { viewModel.confirmarBorrado(anuncio) }) { // <--- Borrado
-                    Icon(Icons.Outlined.Delete, contentDescription = null, tint = Color(0xFFFF4757))
+                IconButton(onClick = { viewModel.confirmarBorrado(anuncio) }) {
+                    Icon(Icons.Outlined.Delete, contentDescription = "Eliminar", tint = Color(0xFFFF4757))
                 }
             }
         }

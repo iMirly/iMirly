@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.imirly.app.ui.SplashScreen
 import com.imirly.app.ui.auth.LoginScreen
 import com.imirly.app.ui.auth.OnboardingScreen
 import com.imirly.app.ui.auth.RegisterScreen
@@ -17,7 +18,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "onboarding") {
+            // El inicio real es el Splash
+            NavHost(navController = navController, startDestination = "splash") {
+                composable("splash") { SplashScreen(navController) }
                 composable("onboarding") { OnboardingScreen(navController) }
                 composable("login") { LoginScreen(navController) }
                 composable("register") { RegisterScreen(navController) }
