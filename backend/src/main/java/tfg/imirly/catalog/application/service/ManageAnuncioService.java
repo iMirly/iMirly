@@ -7,6 +7,7 @@ import tfg.imirly.catalog.application.port.in.ManageAnuncioUseCase;
 import tfg.imirly.catalog.application.port.in.UpdateAnuncioCommand;
 import tfg.imirly.catalog.domain.model.AnuncioServicio;
 import tfg.imirly.catalog.domain.port.out.AnuncioServicioRepositoryPort;
+import tfg.imirly.messages.application.service.ProfanityFilterService;
 
 import java.util.UUID;
 
@@ -15,9 +16,16 @@ import java.util.UUID;
 public class ManageAnuncioService implements ManageAnuncioUseCase {
 
     private final AnuncioServicioRepositoryPort anuncioRepositoryPort;
+    private final ProfanityFilterService profanityFilterService;
 
     @Override
     public AnuncioServicio publicarAnuncio(CreateAnuncioCommand command) {
+        // Validar que el título y la descripción no tengan insultos
+        if (profanityFilterService.containsProfanity(command.getTitulo()) || 
+            profanityFilterService.containsProfanity(command.getDescripcion())) {
+            throw new IllegalArgumentException("El anuncio contiene lenguaje no permitido.");
+        }
+
         // Usamos el constructor de dominio que creamos antes
         AnuncioServicio nuevoAnuncio = new AnuncioServicio(
                 command.getProveedorId(),
@@ -42,14 +50,20 @@ public class ManageAnuncioService implements ManageAnuncioUseCase {
             throw new SecurityException("No tienes permiso para editar este anuncio");
         }
 
-        // 3. Actualizamos los campos (Podríamos hacer un método update() en el dominio como hiciste en User)
+        // 3. Validar contenido inapropiado antes de actualizar
+        if (profanityFilterService.containsProfanity(command.getTitulo()) || 
+            profanityFilterService.containsProfanity(command.getDescripcion())) {
+            throw new IllegalArgumentException("El contenido actualizado contiene lenguaje no permitido.");
+        }
+
+        // 4. Actualizamos los campos
         anuncio.setTitulo(command.getTitulo());
         anuncio.setDescripcion(command.getDescripcion());
         anuncio.setPrecioHora(command.getPrecioHora());
         anuncio.setUbicacion(command.getUbicacion());
         anuncio.setActivo(command.getActivo());
 
-        // 4. Guardamos
+        // 5. Guardamos
         return anuncioRepositoryPort.save(anuncio);
     }
 

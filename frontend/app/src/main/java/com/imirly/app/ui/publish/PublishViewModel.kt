@@ -27,6 +27,7 @@ class PublishViewModel : ViewModel() {
     var categoriaSeleccionadaId = mutableStateOf("")
 
     var isLoading = mutableStateOf(false)
+    var isLoadingSub = mutableStateOf(false) // NUEVO: Para indicar carga de subcategorías
     var errorMensaje = mutableStateOf("")
 
     init {
@@ -34,7 +35,7 @@ class PublishViewModel : ViewModel() {
     }
 
     // Carga inicial de categorías principales
-    private fun cargarCategorias() {
+    fun cargarCategorias() {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.catalogService.getCategorias()
@@ -51,6 +52,7 @@ class PublishViewModel : ViewModel() {
     fun cargarSubcategorias(catId: String) {
         categoriaSeleccionadaId.value = catId
         subcategoriaId.value = "" // Reset subcat al cambiar de categoría
+        isLoadingSub.value = true
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.catalogService.getSubcategorias(catId)
@@ -59,6 +61,8 @@ class PublishViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 errorMensaje.value = "Error al cargar subcategorías"
+            } finally {
+                isLoadingSub.value = false
             }
         }
     }

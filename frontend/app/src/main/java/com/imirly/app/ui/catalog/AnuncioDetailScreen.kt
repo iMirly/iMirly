@@ -9,7 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
@@ -35,20 +35,55 @@ fun AnuncioDetailScreen(navController: NavController, anuncioId: String) {
     LaunchedEffect(anuncioId) { viewModel.cargarDetalle(anuncioId) }
 
     val anuncio = viewModel.anuncio.value
-
+    
     Scaffold(
         bottomBar = {
             if (anuncio != null) {
-                // Botón Contactar fijado abajo
                 Surface(modifier = Modifier.fillMaxWidth().padding(24.dp), color = Color.Transparent) {
-                    Button(
-                        // 👇 AL PULSAR, ABRIMOS EL DIÁLOGO 👇
-                        onClick = { viewModel.showContactDialog.value = true },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = iMirlyPurple)
-                    ) {
-                        Text("Contactar", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    if (viewModel.esMiAnuncio.value) {
+                        Button(
+                            onClick = { },
+                            enabled = false,
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                disabledContainerColor = Color(0xFFF0F0F0),
+                                disabledContentColor = Color.Gray
+                            )
+                        ) {
+                            Icon(Icons.Default.Info, null, modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Tu propio anuncio", fontSize = 16.sp)
+                        }
+                    } else if (viewModel.yaContactado.value) {
+                        Button(
+                            onClick = { },
+                            enabled = false,
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                disabledContainerColor = Color(0xFFE8F5E9),
+                                disabledContentColor = Color(0xFF2ECC71)
+                            )
+                        ) {
+                            Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Solicitud ya enviada", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        }
+                    } else {
+                        Button(
+                            onClick = { viewModel.showContactDialog.value = true },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = iMirlyPurple),
+                            enabled = !viewModel.isSubmitting.value
+                        ) {
+                            if (viewModel.isSubmitting.value) {
+                                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
+                            } else {
+                                Text("Contactar", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
                     }
                 }
             }
@@ -59,11 +94,9 @@ fun AnuncioDetailScreen(navController: NavController, anuncioId: String) {
                 CircularProgressIndicator(color = iMirlyPurple)
             }
         } else if (anuncio != null) {
-            // 1. Column principal SIN padding para que la flecha quede arriba del todo
             Column(
                 modifier = Modifier.fillMaxSize().background(Color(0xFFFAFAFA))
             ) {
-                // 2. CABECERA UNIVERSAL ESTANDARIZADA
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -71,60 +104,38 @@ fun AnuncioDetailScreen(navController: NavController, anuncioId: String) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = Color.Black
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.Black)
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("Detalle del servicio", fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 }
 
-                //3. Segunda Column para hacer scroll del contenido con sus márgenes correctos
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 24.dp)
-                        .padding(bottom = innerPadding.calculateBottomPadding()) // Respetamos el botón de abajo
+                        .padding(bottom = innerPadding.calculateBottomPadding())
                 ) {
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // 👇 ESTA COLUMNA INTERNA ES LA CLAVE PARA CENTRAR AVATAR Y PRECIO 👇
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Box(contentAlignment = Alignment.BottomEnd) {
-                            Surface(
-                                modifier = Modifier.size(120.dp),
-                                shape = CircleShape,
-                                color = iMirlyPurple.copy(alpha = 0.8f)
-                            ) {
-                                Icon(
-                                    Icons.Default.Person,
-                                    null,
-                                    modifier = Modifier.padding(24.dp),
-                                    tint = Color.White
-                                )
-                            }
+                        Surface(
+                            modifier = Modifier.size(120.dp),
+                            shape = CircleShape,
+                            color = iMirlyPurple.copy(alpha = 0.8f)
+                        ) {
+                            Icon(Icons.Default.Person, null, modifier = Modifier.padding(24.dp), tint = Color.White)
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = anuncio.nombreProfesional ?: "Profesional",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text(text = anuncio.nombreProfesional ?: "Profesional", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Default.Star,
-                                null,
-                                tint = Color(0xFFFFB800),
-                                modifier = Modifier.size(16.dp)
-                            )
+                            Icon(Icons.Default.Star, null, tint = Color(0xFFFFB800), modifier = Modifier.size(16.dp))
                             val formatedRating = String.format("%.1f", anuncio.valoracionProfesional).replace(',', '.')
                             Text(" $formatedRating", fontWeight = FontWeight.Bold)
                             Text(" • ${anuncio.numeroValoracionesProfesional} reseñas", color = Color.Gray)
@@ -132,74 +143,35 @@ fun AnuncioDetailScreen(navController: NavController, anuncioId: String) {
 
                         Spacer(modifier = Modifier.height(24.dp))
 
-                        // Badge de Precio Destacado
                         Surface(color = iMirlyPurple, shape = RoundedCornerShape(20.dp)) {
-                            Column(
-                                modifier = Modifier.padding(
-                                    horizontal = 32.dp,
-                                    vertical = 12.dp
-                                ), horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    "${anuncio.precioHora}€",
-                                    color = Color.White,
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.ExtraBold
-                                )
-                                Text(
-                                    "por hora",
-                                    color = Color.White.copy(alpha = 0.8f),
-                                    fontSize = 12.sp
-                                )
+                            Column(modifier = Modifier.padding(horizontal = 32.dp, vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("${anuncio.precioHora}€", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
+                                Text("por hora", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
                             }
                         }
                     }
-                    // 👆 HASTA AQUÍ EL BLOQUE CENTRADO 👆
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // 👇 A PARTIR DE AQUÍ TODO SE ALINEA A LA IZQUIERDA AUTOMÁTICAMENTE 👇
-
-                    // Sección Sobre Mí
                     Text("Sobre mí", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(12.dp))
-                    Surface(
-                        color = Color.White,
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = anuncio.descripcion,
-                            modifier = Modifier.padding(20.dp),
-                            color = Color.DarkGray,
-                            lineHeight = 24.sp
-                        )
+                    Surface(color = Color.White, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
+                        Text(text = anuncio.descripcion, modifier = Modifier.padding(20.dp), color = Color.DarkGray, lineHeight = 24.sp)
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Ubicación
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Default.LocationOn,
-                            null,
-                            tint = iMirlyPurple,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Text(
-                            "  ${anuncio.ubicacion}",
-                            color = Color.Gray,
-                            fontWeight = FontWeight.Medium
-                        )
+                        Icon(Icons.Default.LocationOn, null, tint = iMirlyPurple, modifier = Modifier.size(18.dp))
+                        Text("  ${anuncio.ubicacion}", color = Color.Gray, fontWeight = FontWeight.Medium)
                     }
 
-                    Spacer(modifier = Modifier.height(100.dp)) // Espacio para el botón de abajo
+                    Spacer(modifier = Modifier.height(100.dp))
                 }
             }
         }
     }
 
-    // --- DIÁLOGO PARA ESCRIBIR EL MENSAJE DE CONTACTO ---
     if (viewModel.showContactDialog.value) {
         AlertDialog(
             onDismissRequest = { viewModel.showContactDialog.value = false },
@@ -207,12 +179,11 @@ fun AnuncioDetailScreen(navController: NavController, anuncioId: String) {
             title = { Text("Contactar Profesional", fontWeight = FontWeight.Bold) },
             text = {
                 Column {
-                    Text("Explica brevemente qué necesitas para que el profesional pueda evaluar tu solicitud.", color = Color.Gray, fontSize = 14.sp)
+                    Text("Explica brevemente qué necesitas.", color = Color.Gray, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
                         value = viewModel.mensajeContacto.value,
                         onValueChange = { viewModel.mensajeContacto.value = it },
-                        placeholder = { Text("Ej: Necesito pintar el salón este sábado por la mañana...") },
                         modifier = Modifier.fillMaxWidth().height(120.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = iMirlyPurple)
@@ -222,19 +193,13 @@ fun AnuncioDetailScreen(navController: NavController, anuncioId: String) {
             confirmButton = {
                 Button(
                     onClick = {
-                        // 1. Ocultamos la ventana de escribir al instante
                         viewModel.showContactDialog.value = false
-                        // 2. Mandamos la orden al backend
                         viewModel.enviarSolicitud(anuncioId)
                     },
                     enabled = viewModel.mensajeContacto.value.isNotBlank() && !viewModel.isSubmitting.value,
                     colors = ButtonDefaults.buttonColors(containerColor = iMirlyPurple)
                 ) {
-                    if (viewModel.isSubmitting.value) {
-                        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
-                    } else {
-                        Text("Enviar Solicitud")
-                    }
+                    Text("Enviar Solicitud")
                 }
             },
             dismissButton = {
@@ -245,19 +210,27 @@ fun AnuncioDetailScreen(navController: NavController, anuncioId: String) {
         )
     }
 
-    // --- MENSAJE DE ÉXITO ---
     if (viewModel.requestSuccess.value) {
         AlertDialog(
-            onDismissRequest = { viewModel.requestSuccess.value = false },
+            onDismissRequest = { 
+                viewModel.requestSuccess.value = false 
+                // Navegamos al inicio (Home) y limpiamos todo lo demás
+                navController.navigate("home") {
+                    popUpTo("home") { inclusive = false }
+                }
+            },
             containerColor = Color.White,
-            icon = { Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF2ECC71), modifier = Modifier.size(48.dp)) },
+            icon = { Icon(Icons.Default.CheckCircle, null, tint = Color(0xFF2ECC71), modifier = Modifier.size(48.dp)) },
             title = { Text("¡Solicitud enviada!", textAlign = TextAlign.Center) },
-            text = { Text("El profesional revisará tu solicitud y te contestará pronto. Podrás ver el estado en la pestaña de Mensajes.", textAlign = TextAlign.Center) },
+            text = { Text("El profesional revisará tu solicitud. Podrás ver el estado en Mensajes.", textAlign = TextAlign.Center) },
             confirmButton = {
                 Button(
-                    onClick = {
-                        viewModel.requestSuccess.value = false
-                        // Opcional: navController.popBackStack() si quieres que salga del anuncio tras pedirlo
+                    onClick = { 
+                        viewModel.requestSuccess.value = false 
+                        // Volver al inicio real de la app (Home)
+                        navController.navigate("home") {
+                            popUpTo("home") { inclusive = false }
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = iMirlyPurple)

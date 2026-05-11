@@ -89,17 +89,15 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = viewMode
         // 4. Estadísticas
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             StatItem("2.5K+", "Profesionales")
+            StatItem("12K+", "Anuncios")
             StatItem("4.8★", "Valoración")
             StatItem("15K+", "Servicios")
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // 5. Categorías
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text("Categorías populares", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text("Ver todas", fontSize = 12.sp, color = iMirlyPurple, fontWeight = FontWeight.SemiBold)
-        }
+        // 5. Categorías (Se ha quitado "Ver todas" por ser redundante)
+        Text("Categorías populares", fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(16.dp))
 

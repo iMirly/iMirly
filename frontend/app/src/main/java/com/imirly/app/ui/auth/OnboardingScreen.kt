@@ -7,10 +7,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,9 +18,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.imirly.app.R
 import kotlinx.coroutines.launch
 
@@ -41,7 +39,6 @@ fun OnboardingScreen(navController: NavController) {
             .padding(vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Carrusel de contenido
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.weight(1f)
@@ -49,10 +46,13 @@ fun OnboardingScreen(navController: NavController) {
             OnboardingPageContent(page)
         }
 
-        // 1. Indicador de puntos (Dots)
+        // Dots
         Row(
-            Modifier.height(50.dp).fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            Modifier
+                .height(50.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             repeat(3) { iteration ->
                 val color = if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
@@ -68,7 +68,6 @@ fun OnboardingScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // 2. Botón Principal (Siguiente o Comenzar -> va a REGISTER)
         Button(
             onClick = {
                 if (pagerState.currentPage < 2) {
@@ -77,7 +76,9 @@ fun OnboardingScreen(navController: NavController) {
                     navController.navigate("register")
                 }
             },
-            modifier = Modifier.fillMaxWidth(0.85f).height(55.dp),
+            modifier = Modifier
+                .fillMaxWidth(0.85f)
+                .height(55.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.White),
             shape = RoundedCornerShape(12.dp)
         ) {
@@ -88,7 +89,6 @@ fun OnboardingScreen(navController: NavController) {
             )
         }
 
-        // 3. Botón Secundario (Omitir o Ya tengo cuenta -> va a LOGIN)
         TextButton(
             onClick = { navController.navigate("login") },
             modifier = Modifier.padding(top = 10.dp)
@@ -100,24 +100,36 @@ fun OnboardingScreen(navController: NavController) {
             )
         }
 
-        Text(text = "iMirly v1.0.0", color = Color.White.copy(alpha = 0.5f), fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp))
+        Text(
+            text = "iMirly v1.0.0",
+            color = Color.White.copy(alpha = 0.5f),
+            fontSize = 10.sp,
+            modifier = Modifier.padding(top = 10.dp)
+        )
     }
 }
 
 @Composable
 fun OnboardingPageContent(page: Int) {
     val title = when (page) {
-        0 -> "Encuentra profesionales cerca de ti"
+        0 -> "Encuentra profesionales\ncerca de ti"
         1 -> "Conecta fácilmente"
         else -> "Reserva con confianza"
     }
 
+    val imageRes = when (page) {
+        0 -> R.drawable.onboarding_1_1
+        1 -> R.drawable.onboarding_2_1
+        else -> R.drawable.onboarding_3_1
+    }
+
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Logo arriba en todas las pantallas
         Text(
             text = "iMirly",
             color = Color.White,
@@ -126,25 +138,26 @@ fun OnboardingPageContent(page: Int) {
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
-        // Contenedor de la imagen
-        Box(contentAlignment = Alignment.BottomEnd) {
-            Surface(
-                modifier = Modifier.size(280.dp),
-                shape = RoundedCornerShape(32.dp),
-                color = Color.White.copy(alpha = 0.2f)
-            ) {
-                val imageRes = when (page) {
-                    0 -> R.drawable.onboarding_1
-                    1 -> R.drawable.onboarding_2
-                    else -> R.drawable.onboarding_3
-                }
-                Image(
-                    painter = painterResource(id = imageRes),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
+
+        // Box exterior con borde
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 26.dp)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(52.dp))
+                .background(Color.White.copy(alpha = 0.2f)),  // ← recuadro morado de vuelta
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(44.dp)),
+                contentScale = ContentScale.Crop
+            )
         }
 
         Spacer(modifier = Modifier.height(40.dp))
@@ -171,4 +184,11 @@ fun OnboardingPageContent(page: Int) {
             lineHeight = 22.sp
         )
     }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun ObBoardingPreview(){
+    val navController = rememberNavController()
+    OnboardingScreen(navController = navController)
 }

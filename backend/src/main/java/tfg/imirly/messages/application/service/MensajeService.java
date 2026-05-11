@@ -27,6 +27,7 @@ public class MensajeService implements MensajeUseCase {
     private final SolicitudContratoRepositoryPort solicitudRepositoryPort;
     private final SolicitudContratoUseCase solicitudContratoUseCase;
     private final UserRepositoryPort userRepositoryPort;
+    private final ProfanityFilterService profanityFilterService;
 
     @Override
     @Transactional // O se guarda el mensaje y se cambia el precio, o no se hace nada
@@ -36,7 +37,10 @@ public class MensajeService implements MensajeUseCase {
             throw new IllegalArgumentException("El mensaje no puede estar vacío.");
         }
 
-        // 2. LÓGICA DE NEGOCIO FASE 2: Si es un presupuesto, actualizamos la solicitud
+        // 2. Filtrado de insultos (Censura con asteriscos)
+        String contenidoFiltrado = profanityFilterService.filterText(command.getContenido());
+
+        // 3. LÓGICA DE NEGOCIO FASE 2: Si es un presupuesto, actualizamos la solicitud
         if (command.getTipo() == TipoMensaje.PROPUESTA_PRECIO) {
             actualizarSolicitudConPrecio(command);
         } else if (command.getTipo() == TipoMensaje.TRABAJO_FINALIZADO) {
@@ -66,15 +70,15 @@ public class MensajeService implements MensajeUseCase {
             }
         }
 
-        // 3. Crear el objeto de Dominio
+        // 4. Crear el objeto de Dominio con el contenido ya filtrado
         Mensaje nuevoMensaje = new Mensaje(
                 command.getRemitenteId(),
                 command.getReceptorId(),
                 command.getSolicitudId(),
-                command.getContenido(),
+                contenidoFiltrado,
                 command.getTipo());
 
-        // 4. Guardar y devolver
+        // 5. Guardar y devolver
         return repositoryPort.save(nuevoMensaje);
     }
 

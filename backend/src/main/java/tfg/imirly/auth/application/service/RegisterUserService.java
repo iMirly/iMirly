@@ -8,14 +8,15 @@ import tfg.imirly.auth.application.port.in.RegisterUserUseCase;
 import tfg.imirly.auth.domain.model.User;
 import tfg.imirly.auth.domain.port.out.PasswordEncoderPort;
 import tfg.imirly.auth.domain.port.out.UserRepositoryPort;
+import tfg.imirly.messages.application.service.ProfanityFilterService;
 
 @Service
 @RequiredArgsConstructor
 public class RegisterUserService implements RegisterUserUseCase {
 
-    // Dependencias inyectadas mediante el constructor (gracias a @RequiredArgsConstructor)
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoderPort passwordEncoderPort;
+    private final ProfanityFilterService profanityFilterService;
 
     @Override
     public User registerUser(RegisterUserCommand command) {
@@ -24,10 +25,15 @@ public class RegisterUserService implements RegisterUserUseCase {
             throw new IllegalArgumentException("El email ya está registrado en iMirly");
         }
 
-        // 2. Cifrar la contraseña
+        // 2. Regla de negocio: El nombre no puede contener insultos
+        if (profanityFilterService.containsProfanity(command.getNombre())) {
+            throw new IllegalArgumentException("El nombre contiene lenguaje no permitido.");
+        }
+
+        // 3. Cifrar la contraseña
         String encodedPassword = passwordEncoderPort.encode(command.getRawPassword());
 
-        // 3. Crear el objeto de Dominio
+        // 4. Crear el objeto de Dominio
         User newUser = new User(
                 command.getNombre(),
                 command.getEmail(),
@@ -36,7 +42,7 @@ public class RegisterUserService implements RegisterUserUseCase {
                 command.getDocumentoIdentidad()
         );
 
-        // 4. Guardar usando el puerto de salida y devolver el resultado
+        // 5. Guardar usando el puerto de salida y devolver el resultado
         return userRepositoryPort.save(newUser);
     }
 }

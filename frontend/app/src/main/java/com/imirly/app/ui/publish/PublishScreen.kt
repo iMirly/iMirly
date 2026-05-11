@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +29,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun PublishScreen(onPublishSuccess: () -> Unit, viewModel: PublishViewModel = viewModel()) {
     val iMirlyPurple = Color(0xFF6C5CE7)
 
+    // Cargamos las categorías al entrar por si no están cargadas
+    LaunchedEffect(Unit) {
+        if (viewModel.categorias.value.isEmpty()) {
+            // Asegúrate de que tu ViewModel tenga un método para cargar categorías
+            // o que las cargue en su init {}
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -35,14 +44,13 @@ fun PublishScreen(onPublishSuccess: () -> Unit, viewModel: PublishViewModel = vi
             .verticalScroll(rememberScrollState())
             .padding(24.dp)
     ) {
-        // Cabecera dinámica de Publicar
+        // Cabecera
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             if (viewModel.currentStep.value == 2) {
                 IconButton(onClick = { viewModel.currentStep.value = 1 }, modifier = Modifier.offset(x = (-12).dp)) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                 }
             } else {
-                // Quitamos la X y dejamos un espacio invisible para que el título se centre perfecto
                 Spacer(modifier = Modifier.width(48.dp))
             }
 
@@ -54,10 +62,9 @@ fun PublishScreen(onPublishSuccess: () -> Unit, viewModel: PublishViewModel = vi
                 fontSize = 18.sp
             )
 
-            Spacer(modifier = Modifier.width(48.dp)) // Contrapeso derecho
+            Spacer(modifier = Modifier.width(48.dp))
         }
 
-        // Indicador de progreso
         LinearProgressIndicator(
             progress = { if (viewModel.currentStep.value == 1) 0.5f else 1f },
             modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp).height(6.dp),
@@ -110,7 +117,7 @@ fun PublishScreen(onPublishSuccess: () -> Unit, viewModel: PublishViewModel = vi
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = iMirlyPurple),
-                enabled = viewModel.titulo.value.isNotEmpty() && viewModel.precio.value.isNotEmpty()
+                enabled = viewModel.titulo.value.isNotBlank() && viewModel.precio.value.isNotBlank()
             ) {
                 Text("Continuar", fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
@@ -121,21 +128,37 @@ fun PublishScreen(onPublishSuccess: () -> Unit, viewModel: PublishViewModel = vi
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Selector A: Categorías Principales
+            // Selector A: Categorías Principales (CARRUSEL MEJORADO)
             Text("1. Selecciona una categoría", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = iMirlyPurple)
+            
+            // Usamos un scrollstate independiente para el carrusel
+            val scrollState = rememberScrollState()
             Row(
-                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(scrollState)
+                    .padding(vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 viewModel.categorias.value.forEach { cat ->
+                    val isSelected = viewModel.categoriaSeleccionadaId.value == cat.id
                     FilterChip(
-                        selected = viewModel.categoriaSeleccionadaId.value == cat.id,
+                        selected = isSelected,
                         onClick = { viewModel.cargarSubcategorias(cat.id) },
                         label = { Text(cat.nombre) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = iMirlyPurple.copy(alpha = 0.1f),
-                            selectedLabelColor = iMirlyPurple
-                        )
+                            selectedContainerColor = iMirlyPurple,
+                            selectedLabelColor = Color.White,
+                            containerColor = Color.White,
+                            labelColor = Color.Gray
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = isSelected,
+                            borderColor = Color.LightGray,
+                            selectedBorderColor = iMirlyPurple
+                        ),
+                        shape = RoundedCornerShape(20.dp)
                     )
                 }
             }
@@ -144,26 +167,35 @@ fun PublishScreen(onPublishSuccess: () -> Unit, viewModel: PublishViewModel = vi
 
             // Selector B: Subcategorías
             Text("2. Selecciona la especialidad", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = iMirlyPurple)
-            if (viewModel.subcategorias.value.isEmpty()) {
+            
+            if (viewModel.isLoadingSub.value) { // Supongo que tienes este estado en el VM
+                Box(Modifier.fillMaxWidth().height(100.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = iMirlyPurple, modifier = Modifier.size(24.dp))
+                }
+            } else if (viewModel.subcategorias.value.isEmpty()) {
                 Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
                     Text("Selecciona una categoría arriba para ver opciones", color = Color.LightGray, textAlign = TextAlign.Center)
                 }
             } else {
                 viewModel.subcategorias.value.forEach { sub ->
-                    Row(
+                    Surface(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { viewModel.subcategoriaId.value = sub.id }
-                            .padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .clickable { viewModel.subcategoriaId.value = sub.id },
+                        color = Color.Transparent
                     ) {
-                        RadioButton(
-                            selected = viewModel.subcategoriaId.value == sub.id,
-                            onClick = { viewModel.subcategoriaId.value = sub.id },
-                            colors = RadioButtonDefaults.colors(selectedColor = iMirlyPurple)
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(sub.nombre, fontSize = 16.sp)
+                        Row(
+                            modifier = Modifier.padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = viewModel.subcategoriaId.value == sub.id,
+                                onClick = { viewModel.subcategoriaId.value = sub.id },
+                                colors = RadioButtonDefaults.colors(selectedColor = iMirlyPurple)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(sub.nombre, fontSize = 16.sp, fontWeight = if(viewModel.subcategoriaId.value == sub.id) FontWeight.Bold else FontWeight.Normal)
+                        }
                     }
                     HorizontalDivider(color = Color(0xFFF5F5F5))
                 }
@@ -178,7 +210,7 @@ fun PublishScreen(onPublishSuccess: () -> Unit, viewModel: PublishViewModel = vi
             Button(
                 onClick = {
                     viewModel.publicarAnuncio {
-                        onPublishSuccess() // Llamamos a la magia de navegación que configuraremos ahora
+                        onPublishSuccess()
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -194,7 +226,7 @@ fun PublishScreen(onPublishSuccess: () -> Unit, viewModel: PublishViewModel = vi
             }
         }
 
-        Spacer(modifier = Modifier.height(50.dp)) // Espacio final para scroll
+        Spacer(modifier = Modifier.height(50.dp))
     }
 }
 
@@ -206,6 +238,10 @@ fun PublishTextField(label: String, value: String, onValueChange: (String) -> Un
         label = { Text(label) },
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         shape = RoundedCornerShape(12.dp),
-        singleLine = true
+        singleLine = true,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xFF6C5CE7),
+            focusedLabelColor = Color(0xFF6C5CE7)
+        )
     )
 }

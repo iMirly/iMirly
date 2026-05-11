@@ -49,7 +49,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
                     if (viewModel.mensaje.value.isNotEmpty()) {
                         Text(
                             text = viewModel.mensaje.value,
-                            color = if (viewModel.mensaje.value.contains("éxito")) Color(0xFF2ECC71) else Color.Red, // Verde para éxito
+                            color = if (viewModel.mensaje.value.contains("éxito")) Color(0xFF2ECC71) else Color.Red,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.padding(top = 10.dp)
@@ -59,10 +59,11 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
                     Button(
                         onClick = {
                             viewModel.iniciarSesion {
-                                // Navegamos a "main" y destruimos las pantallas anteriores
-                                // para que al pulsar "Atrás" en el móvil no volvamos al Login
+                                // LIMPIEZA TOTAL DE LA PILA:
+                                // Al navegar a "main", eliminamos todas las pantallas previas (0)
+                                // para que la app se cierre al pulsar "Atrás" desde la Home.
                                 navController.navigate("main") {
-                                    popUpTo("login") { inclusive = true }
+                                    popUpTo(0) { inclusive = true }
                                 }
                             }
                         },
@@ -73,7 +74,17 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = viewMo
                         Text(if (viewModel.isLoading.value) "Cargando..." else "Iniciar sesión")
                     }
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("¿No tienes cuenta? Crear cuenta", color = iMirlyPurple, fontWeight = FontWeight.SemiBold, modifier = Modifier.clickable { navController.navigate("register") })
+                    Text(
+                        text = "¿No tienes cuenta? Crear cuenta", 
+                        color = iMirlyPurple, 
+                        fontWeight = FontWeight.SemiBold, 
+                        modifier = Modifier.clickable { 
+                            // Evitamos que se acumulen pantallas de auth
+                            navController.navigate("register") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        }
+                    )
                 }
             }
         }
