@@ -214,15 +214,6 @@ cd frontend
   </table>
 </div>
 
-# 🎯 Mejoras futuras
-
-- 🔗 **Conexión con SDK de pago real** (Stripe/PayPal) para retiros reales
-- 🔔 **Alertas push** mediante Firebase Cloud Messaging
-- 🗺️ **Mapa interactivo nativo** con filtro de visualización de proveedores
-- 🌙 **Modo oscuro completo** en la app Android
-- 📸 **Subida de imágenes** desde el dispositivo para anuncios y perfiles
-- 🧪 **Tests unitarios y de integración** con cobertura completa
-
 <div align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=0:6c5ce7,100:3f51b5&height=100&section=footer" width="100%"/>
 </div>
