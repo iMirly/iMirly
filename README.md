@@ -175,7 +175,7 @@ cd frontend
 
 ---
 
-## 📚 Lo que aprendí con este proyecto
+## 📚 Lo que aprendimos con este proyecto
 
 - **Arquitectura Hexagonal / Clean Architecture:** Separación total de la lógica de dominio de las librerías y bases de datos mediante Puertos y Adaptadores
 - **Jetpack Compose 100% declarativo:** Construcción de UI moderna sin XML, con estado reactivo y animaciones fluidas
@@ -214,10 +214,39 @@ cd frontend
   </table>
 </div>
 
+## 👥 Equipo
+
+<p align="center"><b>Trabajo Fin de Ciclo DAM — New Digital Talent, Granada · 2025</b></p>
+<p align="center">
+  <a href="https://github.com/AnaNunezRejon">
+    <img src="https://img.shields.io/badge/Ana_Núñez-6c5ce7?style=for-the-badge&logo=github&logoColor=white"/>
+  </a>
+</p>
+<p align="center">
+  <a href="https://github.com/Anyeel">
+    <img src="https://img.shields.io/badge/Ángel_Millán-3f51b5?style=for-the-badge&logo=github&logoColor=white"/>
+  </a>
+</p>
+<p align="center">
+  <a href="https://github.com/evagr11">
+    <img src="https://img.shields.io/badge/Eva_Gallardo-3f51b5?style=for-the-badge&logo=github&logoColor=white"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/nicocorbi">
+    <img src="https://img.shields.io/badge/Nicolás_Corbi-6c5ce7?style=for-the-badge&logo=github&logoColor=white"/>
+  </a>
+</p>
+
+<p align="center">
+  <sub><b>Tutores:</b> Guillermo Sandoval Schmidt · Javier Martín Gómez</sub>
+</p>
+
 <div align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=0:6c5ce7,100:3f51b5&height=100&section=footer" width="100%"/>
 </div>
 
 <div align="center">
-  <sub>© 2025 iMirly — Todos los derechos reservados</sub>
+  <sub>© 2026 iMirly — Todos los derechos reservados</sub>
 </div>
